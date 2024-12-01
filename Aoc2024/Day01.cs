@@ -11,16 +11,7 @@ public partial class Day01 : DayBase
     public override void ParseData()
     {
 
-        var parser = new Parser(Contents
-        //"""
-        //3   4
-        //4   3
-        //2   5
-        //1   3
-        //3   9
-        //3   3
-        //"""u8
-        );
+        var parser = new Parser(Contents);
 
         Locations1.Clear();
         Locations2.Clear();
@@ -52,6 +43,6 @@ public partial class Day01 : DayBase
 
     public override string Solve2()
     {
-        throw new NotImplementedException();
+        return Locations1.Sum(loc1 => loc1 * Locations2.Count(loc2 => loc1 == loc2)).ToString();
     }
 }
