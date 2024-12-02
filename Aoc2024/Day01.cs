@@ -4,6 +4,16 @@ namespace Aoc2024;
 
 public partial class Day01 : DayBase
 {
+    /* 
+     * Measured performance:
+     * 
+     * | Method    | Mean        | Error     | StdDev    |
+     * |---------- |------------:|----------:|----------:|
+     * | ParseData |   120.04 us |  0.171 us |  0.250 us |
+     * | Solve1    |    20.02 us |  0.107 us |  0.160 us |
+     * | Solve2    | 7,389.06 us | 66.119 us | 98.964 us |
+     */
+
     private readonly List<int> Locations1 = [];
     private readonly List<int> Locations2 = [];
 
@@ -41,6 +51,7 @@ public partial class Day01 : DayBase
         return total.ToString();
     }
 
+    [Benchmark]
     public override string Solve2()
     {
         return Locations1.Sum(loc1 => loc1 * Locations2.Count(loc2 => loc1 == loc2)).ToString();
