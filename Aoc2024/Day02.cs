@@ -9,16 +9,7 @@ public partial class Day02 : DayBase
     [Benchmark]
     public override void ParseData()
     {
-        var parser = new Parser(Contents
-        //"""
-        //7 6 4 2 1
-        //1 2 7 8 9
-        //9 7 6 2 1
-        //1 3 2 4 5
-        //8 6 4 4 1
-        //1 3 6 7 9
-        //"""u8
-        );
+        var parser = new Parser(Contents);
 
         Reports.Clear();
 
@@ -41,31 +32,148 @@ public partial class Day02 : DayBase
         var count = 0;
         foreach (var levels in Reports)
         {
+            if (levels.Count < 2 || IsSafe(levels, 0, 1))
+            {
+                ++count;
+            }
+        }
+
+        return count.ToString();
+    }
+
+    private static bool IsSafe(List<int> levels, int i0, int i1, out int diff)
+    {
+        diff = levels[i1] - levels[i0];
+        return diff switch
+        {
+            < -3 => false,// Decreased too much
+            <= -1 => AllDecreasingSafely(levels, start: i1),
+            0 => false,// Neither increasing nor decreasing
+            <= 3 => AllIncreasingSafely(levels, start: i1),
+            // > 3
+            _ => false,// Increased too much
+        };
+    }
+
+    private static bool IsSafe(List<int> levels, int i0, int i1) => IsSafe(levels, i0, i1, out _);
+
+    private static bool AllDecreasingSafely(List<int> levels, int start = 1, int ignoreIndex = int.MaxValue)
+    {
+        int end = levels.Count - 1;
+        if (ignoreIndex == end)
+        {
+            --end;
+        }
+
+        for (int i = start; i < end; i++)
+        {
+            int diff;
+            if (i + 1 == ignoreIndex)
+            {
+                diff = levels[i + 2] - levels[i];
+                i++;
+            }
+            else
+            {
+                diff = levels[i + 1] - levels[i];
+            }
+
+            if (diff is < -3 or > -1) return false;
+        }
+
+        return true;
+    }
+
+    private static bool AllIncreasingSafely(List<int> levels, int start = 1, int ignoreIndex = int.MaxValue)
+    {
+        int end = levels.Count - 1;
+        if (ignoreIndex == end)
+        {
+            --end;
+        }
+
+        for (int i = start; i < end; i++)
+        {
+            int diff;
+            if (i + 1 == ignoreIndex)
+            {
+                diff = levels[i + 2] - levels[i];
+                i++;
+            }
+            else
+            {
+                diff = levels[i + 1] - levels[i];
+            }
+
+            if (diff is < 1 or > 3) return false;
+        }
+
+        return true;
+    }
+
+    [Benchmark]
+    public override string Solve2()
+    {
+        var count = 0;
+        foreach (var levels in Reports)
+        {
             if (levels.Count < 2)
             {
                 ++count;
                 continue;
             }
 
-            var diff = levels[1] - levels[0];
-            switch (diff)
+            // Try without removing
+            if (IsSafe(levels, 0, 1, out int diff0))
+            {
+                ++count;
+                continue;
+            }
+
+            // Try without first
+            if (levels.Count == 2)
+            {
+                ++count;
+                continue;
+            }
+
+            if (IsSafe(levels, 0, 2))
+            {
+                ++count;
+                continue;
+            }
+
+            // Try without second
+            // Count == 2 case already handled
+
+            if (IsSafe(levels, 1, 2))
+            {
+                ++count;
+                continue;
+            }
+
+            // Try without each remaining index
+            // Direction is always matching levels[1]-levels[0] as those two are now always included
+            switch (diff0)
             {
                 case < -3:
                     // Decreased too much
                     break;
                 case <= -1:
-                    if (AllDecreasingSafely(levels))
+                    if (AllDecreasingSafelyWithoutOne(levels))
                     {
                         ++count;
+                        continue;
                     }
                     break;
                 case 0:
                     // Neither increasing nor decreasing
                     break;
                 case <= 3:
-                    if (AllIncreasingSafely(levels))
+                    if (AllIncreasingSafelyWithoutOne(levels))
                     {
                         ++count;
+                        continue;
                     }
                     break;
                 default: // > 3
@@ -77,31 +185,29 @@ public partial class Day02 : DayBase
         return count.ToString();
     }
 
-    private static bool AllDecreasingSafely(List<int> levels)
+    private static bool AllDecreasingSafelyWithoutOne(List<int> levels)
     {
-        for (int i = 1; i < levels.Count - 1; i++)
+        for (int i = 2; i < levels.Count; i++)
         {
-            var diff = levels[i + 1] - levels[i];
-            if (diff is < -3 or > -1) return false;
+            if (AllDecreasingSafely(levels, ignoreIndex: i))
+            {
+                return true;
+            }
         }
 
-        return true;
+        return false;
     }
 
-    private static bool AllIncreasingSafely(List<int> levels)
+    private static bool AllIncreasingSafelyWithoutOne(List<int> levels)
     {
-        for (int i = 1; i < levels.Count - 1; i++)
+        for (int i = 2; i < levels.Count; i++)
         {
-            var diff = levels[i + 1] - levels[i];
-            if (diff is < 1 or > 3) return false;
+            if (AllIncreasingSafely(levels, ignoreIndex: i))
+            {
+                return true;
+            }
         }
 
-        return true;
-    }
-
-    [Benchmark]
-    public override string Solve2()
-    {
-        throw new NotImplementedException();
+        return false;
     }
 }
