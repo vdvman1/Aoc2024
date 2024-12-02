@@ -4,6 +4,16 @@ namespace Aoc2024;
 
 public partial class Day02 : DayBase
 {
+    /* 
+     * Measured performance:
+     * 
+     * | Method    | Mean      | Error    | StdDev   |
+     * |---------- |----------:|---------:|---------:|
+     * | ParseData | 128.13 us | 0.726 us | 1.042 us |
+     * | Solve1    |  14.72 us | 0.132 us | 0.189 us |
+     * | Solve2    |  27.08 us | 0.266 us | 0.364 us |
+     */
+
     private readonly List<List<int>> Reports = [];
 
     [Benchmark]
