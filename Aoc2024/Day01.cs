@@ -9,9 +9,9 @@ public partial class Day01 : DayBase
      * 
      * | Method    | Mean      | Error    | StdDev   |
      * |---------- |----------:|---------:|---------:|
-     * | ParseData | 120.51 us | 0.709 us | 0.994 us |
-     * | Solve1    |  19.19 us | 0.120 us | 0.173 us |
-     * | Solve2    |  92.04 us | 1.520 us | 2.229 us |
+     * | ParseData | 120.19 us | 0.403 us | 0.591 us |
+     * | Solve1    |  21.71 us | 0.154 us | 0.225 us |
+     * | Solve2    |  31.10 us | 0.294 us | 0.440 us |
      */
 
     private readonly List<int> Locations1 = [];
@@ -54,7 +54,13 @@ public partial class Day01 : DayBase
     [Benchmark]
     public override string Solve2()
     {
-        var counts = Locations2.GroupBy(loc => loc, (loc, duplicates) => new KeyValuePair<int, int>(loc, duplicates.Count())).ToDictionary();
+        var counts = new Dictionary<int, int>(capacity: Locations2.Count);
+        foreach (var loc in Locations2)
+        {
+            counts.TryGetValue(loc, out var count);
+            counts[loc] = count + 1;
+        }
+
         return Locations1.Sum(loc1 => loc1 * counts.GetValueOrDefault(loc1)).ToString();
     }
 }
