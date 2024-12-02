@@ -7,11 +7,11 @@ public partial class Day01 : DayBase
     /* 
      * Measured performance:
      * 
-     * | Method    | Mean      | Error    | StdDev   |
-     * |---------- |----------:|---------:|---------:|
-     * | ParseData | 120.19 us | 0.403 us | 0.591 us |
-     * | Solve1    |  21.71 us | 0.154 us | 0.225 us |
-     * | Solve2    |  31.10 us | 0.294 us | 0.440 us |
+     * | Method    | Mean     | Error    | StdDev   |
+     * |---------- |---------:|---------:|---------:|
+     * | ParseData | 97.74 us | 0.326 us | 0.446 us |
+     * | Solve1    | 17.20 us | 0.109 us | 0.156 us |
+     * | Solve2    | 30.51 us | 0.182 us | 0.267 us |
      */
 
     private readonly List<int> Locations1 = [];
