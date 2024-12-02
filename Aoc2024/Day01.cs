@@ -7,11 +7,11 @@ public partial class Day01 : DayBase
     /* 
      * Measured performance:
      * 
-     * | Method    | Mean        | Error     | StdDev    |
-     * |---------- |------------:|----------:|----------:|
-     * | ParseData |   120.04 us |  0.171 us |  0.250 us |
-     * | Solve1    |    20.02 us |  0.107 us |  0.160 us |
-     * | Solve2    | 7,389.06 us | 66.119 us | 98.964 us |
+     * | Method    | Mean      | Error    | StdDev   |
+     * |---------- |----------:|---------:|---------:|
+     * | ParseData | 120.51 us | 0.709 us | 0.994 us |
+     * | Solve1    |  19.19 us | 0.120 us | 0.173 us |
+     * | Solve2    |  92.04 us | 1.520 us | 2.229 us |
      */
 
     private readonly List<int> Locations1 = [];
@@ -54,6 +54,7 @@ public partial class Day01 : DayBase
     [Benchmark]
     public override string Solve2()
     {
-        return Locations1.Sum(loc1 => loc1 * Locations2.Count(loc2 => loc1 == loc2)).ToString();
+        var counts = Locations2.GroupBy(loc => loc, (loc, duplicates) => new KeyValuePair<int, int>(loc, duplicates.Count())).ToDictionary();
+        return Locations1.Sum(loc1 => loc1 * counts.GetValueOrDefault(loc1)).ToString();
     }
 }
