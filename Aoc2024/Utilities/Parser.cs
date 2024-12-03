@@ -62,8 +62,60 @@ public ref struct Parser
         return true;
     }
 
+    public int MovePastAny(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, ReadOnlySpan<byte> c)
+    {
+        var bytes = Bytes[Offset..];
+        var indexA = bytes.IndexOf(a);
+        var indexB = bytes.IndexOf(b);
+        var indexC = bytes.IndexOf(c);
+
+        var minIndex = MinPos(indexA, MinPos(indexB, indexC));
+        if (minIndex < 0)
+        {
+            return -1;
+        }
+        else if (minIndex == indexA)
+        {
+            Offset += indexA + a.Length;
+            return 0;
+        }
+        else if (minIndex == indexB)
+        {
+            Offset += indexB + b.Length;
+            return 1;
+        }
+        else if (minIndex == indexC)
+        {
+            Offset += indexC + c.Length;
+            return 2;
+        }
+
+        return -1;
+    }
+
+    private static int MinPos(int a, int b)
+    {
+        if (a < 0)
+        {
+            return b;
+        }
+
+        if (b < 0)
+        {
+            return a;
+        }
+
+        return Math.Min(a, b);
+    }
+
     public bool TryParseDigit(out int digit)
     {
+        if (IsEmpty)
+        {
+            digit = 0;
+            return false;
+        }
+
         digit = Bytes[Offset] - '0';
         if ((uint)digit <= 9u)
         {
@@ -76,7 +128,7 @@ public ref struct Parser
 
     public bool TryMatch(byte c)
     {
-        if (Bytes[Offset] == c)
+        if (!IsEmpty && Bytes[Offset] == c)
         {
             ++Offset;
             return true;
