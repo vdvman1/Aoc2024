@@ -6,14 +6,14 @@ public partial class Day03 : DayBase
 {
     public override void ParseData()
     {
-        // Currently no common parsing
+        // No common parsing
     }
 
     [Benchmark]
     public override string Solve1()
     {
         var total = 0;
-        var parser = new Parser(Contents /*"xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"u8*/);
+        var parser = new Parser(Contents);
         while (parser.MovePastNext("mul("u8))
         {
             total += ParseMulParams(ref parser);
@@ -102,6 +102,30 @@ public partial class Day03 : DayBase
     [Benchmark]
     public override string Solve2()
     {
-        throw new NotImplementedException();
+        var total = 0;
+        bool enabled = true;
+        var parser = new Parser(Contents);
+
+        while (parser.MovePastAny("mul("u8, "do()"u8, "don't()"u8) is int chosen and >= 0)
+        {
+            switch (chosen)
+            {
+                case 0: // mul(
+                    if (enabled)
+                    {
+                        total += ParseMulParams(ref parser);
+                    }
+                    break;
+                case 1: // do()
+                    enabled = true;
+                    break;
+                case 2: // don't()
+                    enabled = false;
+                    break;
+
+            }
+        }
+
+        return total.ToString();
     }
 }
