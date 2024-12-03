@@ -4,6 +4,15 @@ namespace Aoc2024;
 
 public partial class Day03 : DayBase
 {
+    /*
+     * Measured performance:
+     * 
+     * | Method | Mean     | Error    | StdDev   |
+     * |------- |---------:|---------:|---------:|
+     * | Solve1 | 25.37 us | 0.105 us | 0.150 us |
+     * | Solve2 | 89.40 us | 0.491 us | 0.704 us |
+     */
+
     public override void ParseData()
     {
         // No common parsing
