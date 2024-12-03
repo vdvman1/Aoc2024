@@ -62,6 +62,31 @@ public ref struct Parser
         return true;
     }
 
+    public int MovePastAny(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
+    {
+        var bytes = Bytes[Offset..];
+        var indexA = bytes.IndexOf(a);
+        var indexB = bytes.IndexOf(b);
+
+        var minIndex = MinPos(indexA, indexB);
+        if (minIndex < 0)
+        {
+            return -1;
+        }
+        else if (minIndex == indexA)
+        {
+            Offset += indexA + a.Length;
+            return 0;
+        }
+        else if (minIndex == indexB)
+        {
+            Offset += indexB + b.Length;
+            return 1;
+        }
+
+        return -1;
+    }
+
     public int MovePastAny(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, ReadOnlySpan<byte> c)
     {
         var bytes = Bytes[Offset..];
