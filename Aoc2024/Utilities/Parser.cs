@@ -49,4 +49,39 @@ public ref struct Parser
         Offset += index + 1;
         return parser;
     }
+
+    public bool MovePastNext(ReadOnlySpan<byte> search)
+    {
+        var index = Bytes[Offset..].IndexOf(search);
+        if (index < 0)
+        {
+            return false;
+        }
+
+        Offset += index + search.Length;
+        return true;
+    }
+
+    public bool TryParseDigit(out int digit)
+    {
+        digit = Bytes[Offset] - '0';
+        if ((uint)digit <= 9u)
+        {
+            ++Offset;
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool TryMatch(byte c)
+    {
+        if (Bytes[Offset] == c)
+        {
+            ++Offset;
+            return true;
+        }
+
+        return false;
+    }
 }
