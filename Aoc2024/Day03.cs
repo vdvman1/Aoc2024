@@ -9,8 +9,8 @@ public partial class Day03 : DayBase
      * 
      * | Method | Mean     | Error    | StdDev   |
      * |------- |---------:|---------:|---------:|
-     * | Solve1 | 25.37 us | 0.105 us | 0.150 us |
-     * | Solve2 | 89.40 us | 0.491 us | 0.704 us |
+     * | Solve1 | 25.52 us | 0.145 us | 0.198 us |
+     * | Solve2 | 32.27 us | 0.159 us | 0.223 us |
      */
 
     public override void ParseData()
@@ -112,24 +112,20 @@ public partial class Day03 : DayBase
     public override string Solve2()
     {
         var total = 0;
-        bool enabled = true;
         var parser = new Parser(Contents);
 
-        while (parser.MovePastAny("mul("u8, "do()"u8, "don't()"u8) is int chosen and >= 0)
+        while (parser.MovePastAny("mul("u8, "don't()"u8) is int chosen and >= 0)
         {
             switch (chosen)
             {
                 case 0: // mul(
-                    if (enabled)
+                    total += ParseMulParams(ref parser);
+                    break;
+                case 1: // don't()
+                    if (!parser.MovePastNext("do()"u8))
                     {
-                        total += ParseMulParams(ref parser);
+                        return total.ToString();
                     }
-                    break;
-                case 1: // do()
-                    enabled = true;
-                    break;
-                case 2: // don't()
-                    enabled = false;
                     break;
 
             }
