@@ -1,4 +1,6 @@
-﻿namespace Aoc2024;
+using Aoc2024.Utilities;
+
+namespace Aoc2024;
 
 public partial class Day04 : DayBase
 {
@@ -7,14 +9,14 @@ public partial class Day04 : DayBase
     [Benchmark]
     public override void ParseData()
     {
-        var chars = Contents;
+        var parser = new Parser(Contents);
 
         // TODO: Avoid allocating a new array for each line using a 2d array
 
         Grid.Clear();
-        foreach (var lineRange in chars.Split((byte)'\n'))
+        while (!parser.IsEmpty)
         {
-            var line = chars[lineRange];
+            var line = parser.ParseLine().Remainder;
             if (line.Length > 0)
             {
                 if (line[^1] == (byte)'\r')
