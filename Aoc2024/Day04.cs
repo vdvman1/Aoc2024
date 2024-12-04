@@ -1,9 +1,19 @@
-using Aoc2024.Utilities;
+﻿using Aoc2024.Utilities;
 
 namespace Aoc2024;
 
 public partial class Day04 : DayBase
 {
+    /*
+     * Measured performance:
+     * 
+     * | Method    | Mean       | Error     | StdDev    |
+     * |---------- |-----------:|----------:|----------:|
+     * | ParseData |   5.039 us | 0.0795 us | 0.1114 us |
+     * | Solve1    | 163.102 us | 0.6475 us | 0.9286 us |
+     * | Solve2    |  95.337 us | 0.3576 us | 0.5013 us |
+     */
+
     private readonly List<byte[]> Grid = [];
 
     [Benchmark]
