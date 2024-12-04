@@ -13,6 +13,8 @@ public ref struct Parser
 
     public readonly bool IsEmpty => Offset >= Bytes.Length;
 
+    public readonly ReadOnlySpan<byte> Remainder => Bytes[Offset..];
+
     public void MoveNext() => Offset++;
 
     public int ParsePosInt()
