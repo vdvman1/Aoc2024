@@ -7,20 +7,7 @@ public partial class Day04 : DayBase
     [Benchmark]
     public override void ParseData()
     {
-        var chars = Contents
-            //"""
-            //MMMSXXMASM
-            //MSAMXMSMSA
-            //AMXSXMAAMM
-            //MSAMASMSMX
-            //XMASAMXAMM
-            //XXAMMXXAMA
-            //SMSMSASXSS
-            //SAXAMASAAA
-            //MAMMMXMMMM
-            //MXMXAXMASX
-            //"""u8
-            ;
+        var chars = Contents;
 
         // TODO: Avoid allocating a new array for each line using a 2d array
 
@@ -128,6 +115,45 @@ public partial class Day04 : DayBase
     [Benchmark]
     public override string Solve2()
     {
-        throw new NotImplementedException();
+        var count = 0;
+        // Outer edges can't be the center of an "X-MAS"
+        for (int y = 1; y < Grid.Count - 1; y++)
+        {
+            var row = Grid[y];
+            for (int x = 1; x < row.Length - 1; x++)
+            {
+                if (row[x] != (byte)'A') { continue; }
+
+                var rowM1 = Grid[y - 1];
+                var rowP1 = Grid[y + 1];
+
+                switch (rowM1[x - 1])
+                {
+                    case (byte)'M':
+                        if (rowP1[x + 1] != (byte)'S') continue;
+                        break;
+                    case (byte)'S':
+                        if (rowP1[x + 1] != (byte)'M') continue;
+                        break;
+                    default:
+                        continue;
+                }
+
+                switch (rowM1[x + 1])
+                {
+                    case (byte)'M':
+                        if (rowP1[x - 1] != (byte)'S') continue;
+                        break;
+                    case (byte)'S':
+                        if (rowP1[x - 1] != (byte)'M') continue;
+                        break;
+                    default:
+                        continue;
+                }
+
+                ++count;
+            }
+        }
+        return count.ToString();
     }
 }
