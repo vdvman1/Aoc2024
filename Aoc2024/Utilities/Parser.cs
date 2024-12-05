@@ -52,6 +52,28 @@ public ref struct Parser
         return parser;
     }
 
+    public Parser ParseLineProper()
+    {
+        Parser parser;
+        var index = Bytes[Offset..].IndexOfAny((byte)'\n', (byte)'\r');
+        if (index < 0)
+        {
+            parser = new Parser(Bytes, Offset);
+            Offset = Bytes.Length;
+            return parser;
+        }
+
+        var end = Offset + index;
+        parser = new Parser(Bytes[..end], Offset);
+
+        if (Bytes[end] == (byte)'\r')
+        {
+            ++end; // Skip following \n
+        }
+        Offset = end + 1;
+        return parser;
+    }
+
     public bool MovePastNext(ReadOnlySpan<byte> search)
     {
         var index = Bytes[Offset..].IndexOf(search);
