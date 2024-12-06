@@ -4,44 +4,32 @@ namespace Aoc2024;
 
 public partial class Day05 : DayBase
 {
-    private readonly Dictionary<int, List<int>> OrderingRules = [];
+    private readonly struct Node
+    {
+        /// <summary>
+        /// Pages that must come before this page
+        /// </summary>
+        public readonly List<int> Before;
+
+        /// <summary>
+        /// Pages that must come after this page
+        /// </summary>
+        public readonly List<int> After;
+
+        public Node()
+        {
+            Before = [];
+            After = [];
+        }
+    }
+
+    private readonly Dictionary<int, Node> OrderingRules = [];
     private readonly List<List<int>> Pages = [];
 
     [Benchmark]
     public override void ParseData()
     {
-        var parser = new Parser(Contents
-        //"""
-        //47|53
-        //97|13
-        //97|61
-        //97|47
-        //75|29
-        //61|13
-        //75|53
-        //29|13
-        //97|29
-        //53|29
-        //61|53
-        //97|53
-        //61|29
-        //47|13
-        //75|47
-        //97|75
-        //47|61
-        //75|61
-        //47|29
-        //75|13
-        //53|13
-
-        //75,47,61,53,29
-        //97,61,53,29,13
-        //75,29,13
-        //75,97,47,61,53
-        //61,13,29
-        //97,13,75,29,47
-        //"""u8
-        );
+        var parser = new Parser(Contents);
 
         OrderingRules.Clear();
         Pages.Clear();
@@ -52,13 +40,20 @@ public partial class Day05 : DayBase
             var before = lineParser.ParsePosInt();
             lineParser.MoveNext(); // Skip "|"
             var after = lineParser.ParsePosInt();
-            if (!OrderingRules.TryGetValue(after, out var orderingRules))
-            {
-                orderingRules = [];
-                OrderingRules[after] = orderingRules;
-            }
 
-            orderingRules.Add(before);
+            if (!OrderingRules.TryGetValue(before, out var beforeRules))
+            {
+                beforeRules = new();
+                OrderingRules[before] = beforeRules;
+            }
+            beforeRules.After.Add(after);
+
+            if (!OrderingRules.TryGetValue(after, out var afterRules))
+            {
+                afterRules = new();
+                OrderingRules[after] = afterRules;
+            }
+            afterRules.Before.Add(before);
         }
 
         // Parse page lists
@@ -97,7 +92,7 @@ public partial class Day05 : DayBase
         {
             if (!OrderingRules.TryGetValue(pages[i], out var orderingRules)) { continue; }
 
-            if (orderingRules.Any(after => pages.IndexOf(after, i + 1) >= 0))
+            if (orderingRules.Before.Any(before => pages.IndexOf(before, i + 1) >= 0))
             {
                 return false;
             }
@@ -109,6 +104,95 @@ public partial class Day05 : DayBase
     [Benchmark]
     public override string Solve2()
     {
-        throw new NotImplementedException();
+        var sum = 0;
+
+        var tree = new Dictionary<int, Node>();
+        var orderedPages = new List<int>();
+        var sources = new Queue<(int, List<int>)>();
+
+        foreach (var pages in Pages)
+        {
+            // Build actual rules DAG, so that any pages that don't exist aren't included in the topological sort
+            tree.Clear();
+            bool outOfOrder = false;
+            foreach (int page in pages)
+            {
+                if (!OrderingRules.TryGetValue(page, out var orderingRules)) { throw new InvalidOperationException("Unable to order pages without any rules"); }
+
+                if (!tree.TryGetValue(page, out var thisNode))
+                {
+                    thisNode = new();
+                    tree[page] = thisNode;
+                }
+
+                foreach (var after in orderingRules.After)
+                {
+                    if (tree.TryGetValue(after, out var afterNode))
+                    {
+                        // Page already seen, means it comes before this,
+                        // but must be after, so out of order
+                        outOfOrder = true;
+                        afterNode.Before.Add(page);
+                        thisNode.After.Add(after);
+                    }
+
+                    // If not seen yet, after page either doesn't exist or is in order and will be handled by its Before list later when encountered
+                }
+
+                foreach (var before in orderingRules.Before)
+                {
+                    if (tree.TryGetValue(before, out var beforeNode))
+                    {
+                        // Page already seen, means it comes before this
+                        // and is in correct order
+                        beforeNode.After.Add(page);
+                        thisNode.Before.Add(before);
+                    }
+
+                    // If not seen yet, before page either doesn't exist or is out of order and will be handled by its After list later when encountered
+                }
+            }
+
+            if (outOfOrder) // Only out of order page lists should be reordered and counted in the sum
+            {
+                orderedPages.Clear();
+
+                // Find source nodes (nodes without any incoming edges, in this case Before pages)
+                sources.Clear();
+                foreach (var (page, rules) in tree)
+                {
+                    if (rules.Before.Count == 0)
+                    {
+                        sources.Enqueue((page, rules.After));
+                    }
+                }
+
+                // Add each source to the page order
+                while (sources.TryDequeue(out var node))
+                {
+                    var (page, children) = node;
+
+                    orderedPages.Add(page);
+
+                    // Remove this node from the tree
+                    foreach (var after in children)
+                    {
+                        var rules = tree[after];
+                        rules.Before.Remove(page);
+
+                        // Check if the child node is now a source
+                        if (rules.Before.Count == 0)
+                        {
+                            sources.Enqueue((after, rules.After));
+                        }
+                    }
+                }
+
+                // Sum up middle element
+                sum += orderedPages[pages.Count / 2];
+            }
+        }
+
+        return sum.ToString();
     }
 }
