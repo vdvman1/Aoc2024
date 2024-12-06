@@ -86,11 +86,14 @@ public partial class Day06 : DayBase
     [Benchmark]
     public override string Solve1()
     {
+        // Copy map to avoid mutating original
+        var map = Map.ConvertAll(row => row.ToList());
+
         var count = 1; // Include the guard starting position
         var direction = GuardStartDirection;
         var pos = GuardStartPos;
         var nextPos = pos + direction;
-        while (0 <= nextPos.Y && nextPos.Y < Map.Count && 0 <= nextPos.X && Map[nextPos.Y] is var row && nextPos.X < row.Count)
+        while (0 <= nextPos.Y && nextPos.Y < map.Count && 0 <= nextPos.X && map[nextPos.Y] is var row && nextPos.X < row.Count)
         {
             switch (row[nextPos.X])
             {
