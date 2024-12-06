@@ -17,6 +17,8 @@ public ref struct Parser
 
     public void MoveNext() => Offset++;
 
+    public byte ParseOne() => IsEmpty ? (byte)0 : Bytes[Offset++];
+
     public int ParsePosInt()
     {
         int result = 0;
