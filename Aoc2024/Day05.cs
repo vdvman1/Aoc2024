@@ -4,6 +4,16 @@ namespace Aoc2024;
 
 public partial class Day05 : DayBase
 {
+    /*
+     * Measured performance:
+     * 
+     * | Method    | Mean        | Error    | StdDev    |
+     * |---------- |------------:|---------:|----------:|
+     * | ParseData |    82.41 us | 0.508 us |  0.729 us |
+     * | Solve1    |   498.17 us | 2.643 us |  3.790 us |
+     * | Solve2    | 2,292.23 us | 8.335 us | 12.218 us |
+     */
+
     private readonly struct Node
     {
         /// <summary>
