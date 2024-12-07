@@ -22,4 +22,20 @@ public record struct VectorI2d(int X, int Y)
         // y = x
         return new(-Y, X);
     }
+
+    /// <summary>
+    /// Get a perfect sequential hash for this vector, assuming this is a unit vector
+    /// </summary>
+    /// <remarks>
+    /// If this vector isn't a unit vector, the resulting hash is not likely to be good quality.
+    /// </remarks>
+    /// <returns>A hash between 0 and 3 (inclusive) without gaps or collisions (if this is a unit vector)</returns>
+    public readonly int GetUnitHash()
+    {
+        // UP    =  0, -1    0 * 2 =  0    0 - 1 = -1   ~-1 =  0   abs( 0) = 0
+        // LEFT  = -1,  0   -1 * 2 = -2   -2 + 0 = -2   ~-2 =  1   abs( 1) = 1
+        // DOWN  =  0,  1    0 * 2 =  0    0 + 1 =  1   ~ 1 = -2   abs(-2) = 2
+        // RIGHT =  1,  0    1 * 2 =  2    2 + 0 =  2   ~ 2 = -3   abs(-3) = 3
+        return Math.Abs(~((X << 1) + Y));
+    }
 }
