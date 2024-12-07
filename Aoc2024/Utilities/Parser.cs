@@ -1,4 +1,4 @@
-namespace Aoc2024.Utilities;
+﻿namespace Aoc2024.Utilities;
 
 public ref struct Parser
 {
@@ -24,6 +24,17 @@ public ref struct Parser
     public int ParsePosInt()
     {
         int result = 0;
+        while (!IsEmpty && (Bytes[Offset] - '0') is var c && (uint)c <= 9u)
+        {
+            result = 10 * result + c;
+            MoveNext();
+        }
+        return result;
+    }
+
+    public long ParsePosLong()
+    {
+        long result = 0;
         while (!IsEmpty && (Bytes[Offset] - '0') is var c && (uint)c <= 9u)
         {
             result = 10 * result + c;
