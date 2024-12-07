@@ -4,6 +4,16 @@ namespace Aoc2024;
 
 public partial class Day07 : DayBase
 {
+    /*
+     * Measured performance:
+     * 
+     * | Method    | Mean         | Error       | StdDev      |
+     * |---------- |-------------:|------------:|------------:|
+     * | ParseData |     149.4 us |     2.51 us |     3.59 us |
+     * | Solve1    |   1,107.2 us |    10.13 us |    14.20 us |
+     * | Solve2    | 353,388.0 us | 3,536.62 us | 4,957.84 us |
+     */
+
     private readonly record struct Equation(long Result, List<int> Terms);
     private readonly List<Equation> Equations = [];
 
