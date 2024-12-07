@@ -1,5 +1,4 @@
-﻿using Aoc2024.Utilities;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace Aoc2024;
