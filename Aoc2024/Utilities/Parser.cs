@@ -1,4 +1,4 @@
-﻿namespace Aoc2024.Utilities;
+namespace Aoc2024.Utilities;
 
 public ref struct Parser
 {
@@ -16,6 +16,8 @@ public ref struct Parser
     public readonly ReadOnlySpan<byte> Remainder => Bytes[Offset..];
 
     public void MoveNext() => Offset++;
+
+    public void Skip(int count) => Offset = Math.Min(Offset + count, Bytes.Length);
 
     public byte ParseOne() => IsEmpty ? (byte)0 : Bytes[Offset++];
 
