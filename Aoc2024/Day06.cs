@@ -6,6 +6,16 @@ namespace Aoc2024;
 
 public partial class Day06 : DayBase
 {
+    /*
+     * Measured performance:
+     * 
+     * | Method    | Mean        | Error     | StdDev    |
+     * |---------- |------------:|----------:|----------:|
+     * | ParseData |    101.5 us |   0.66 us |   0.95 us |
+     * | Solve1    |    102.5 us |   0.37 us |   0.49 us |
+     * | Solve2    | 64,495.8 us | 124.03 us | 177.88 us |
+     */
+
     private enum Cell : byte
     {
         Empty,
