@@ -2,6 +2,16 @@
 
 public partial class Day08 : DayBase
 {
+    /*
+     * Measured performance:
+     * 
+     * | Method    | Mean      | Error     | StdDev    |
+     * |---------- |----------:|----------:|----------:|
+     * | ParseData |  7.305 us | 0.0840 us | 0.1205 us |
+     * | Solve1    | 16.038 us | 0.0589 us | 0.0807 us |
+     * | Solve2    | 57.130 us | 0.1927 us | 0.2825 us |
+     */
+
     private readonly Dictionary<byte, List<VectorI2d>> Antennas = [];
     private int Width = 0;
     private int Height = 0;
