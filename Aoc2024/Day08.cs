@@ -9,22 +9,7 @@ public partial class Day08 : DayBase
     [Benchmark]
     public override void ParseData()
     {
-        var parser = new Parser(Contents
-        //"""
-        //............
-        //........0...
-        //.....0......
-        //.......0....
-        //....0.......
-        //......A.....
-        //............
-        //............
-        //........A...
-        //.........A..
-        //............
-        //............
-        //"""u8
-        );
+        var parser = new Parser(Contents);
         Antennas.Clear();
 
         var line0Parser = parser.ParseLineProper();
@@ -74,36 +59,69 @@ public partial class Day08 : DayBase
                     var loc2 = locations[j];
                     var diff = loc2 - loc1;
 
-                    var antinode = loc2 + diff;
-                    if ((uint)antinode.X < (uint)Width && (uint)antinode.Y < (uint)Height)
-                    {
-                        ref var existing = ref seen[antinode.Y, antinode.X];
-                        if (!existing)
-                        {
-                            existing = true;
-                            ++count;
-                        }
-                    }
-
-                    antinode = loc1 - diff;
-                    if ((uint)antinode.X < (uint)Width && (uint)antinode.Y < (uint)Height)
-                    {
-                        ref var existing = ref seen[antinode.Y, antinode.X];
-                        if (!existing)
-                        {
-                            existing = true;
-                            ++count;
-                        }
-                    }
+                    count += CountAntinode(seen, loc2 + diff) + CountAntinode(seen, loc1 - diff);
                 }
             }
         }
         return count.ToString();
     }
 
+    private int CountAntinode(bool[,] seen, VectorI2d pos) => CountAntinode(seen, pos, out _);
+
+    private int CountAntinode(bool[,] seen, VectorI2d pos, out bool outOfBounds)
+    {
+        if ((uint)pos.X < (uint)Width && (uint)pos.Y < (uint)Height)
+        {
+            outOfBounds = false;
+            ref var existing = ref seen[pos.Y, pos.X];
+            if (!existing)
+            {
+                existing = true;
+                return 1;
+            }
+        }
+        else
+        {
+            outOfBounds = true;
+        }
+
+        return 0;
+    }
+
     [Benchmark]
     public override string Solve2()
     {
-        throw new NotImplementedException();
+        var seen = new bool[Height, Width];
+        var count = 0;
+        foreach (var locations in Antennas.Values)
+        {
+            for (int i = 0; i < locations.Count; i++)
+            {
+                var loc1 = locations[i];
+                for (int j = i + 1; j < locations.Count; j++)
+                {
+                    var loc2 = locations[j];
+                    var diff = (loc2 - loc1).Simplified();
+
+                    var loc = loc2;
+                    count += CountAntinode(seen, loc, out bool outOfBounds);
+                    do
+                    {
+                        loc += diff;
+                        count += CountAntinode(seen, loc, out outOfBounds);
+                    } while (!outOfBounds);
+
+                    loc = loc2 - diff;
+                    count += CountAntinode(seen, loc, out outOfBounds);
+                    while (!outOfBounds)
+                    {
+                        loc -= diff;
+                        count += CountAntinode(seen, loc, out outOfBounds);
+                    }
+                }
+            }
+        }
+
+        return count.ToString();
     }
 }
