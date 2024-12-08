@@ -8,6 +8,13 @@ public record struct VectorI2d(int X, int Y)
     public static readonly VectorI2d DOWN = new(0, 1);
 
     public static VectorI2d operator +(VectorI2d a, VectorI2d b) => new(a.X + b.X, a.Y + b.Y);
+    public static VectorI2d operator -(VectorI2d a, VectorI2d b) => new(a.X - b.X, a.Y - b.Y);
+
+    public readonly VectorI2d Simplified()
+    {
+        var gcd = MathPlus.Gcd(X, Y);
+        return new(X / gcd, Y / gcd);
+    }
 
     public readonly VectorI2d Rotated90CW()
     {
