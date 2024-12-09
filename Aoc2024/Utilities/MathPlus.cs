@@ -18,4 +18,18 @@ public static class MathPlus
 
         return Math.Abs(a);
     }
+
+    public static long NextPow10(this int value) => NextPow10((long)value);
+
+    public static long NextPow10(this long value)
+    {
+        long res = 1;
+
+        while (res <= value)
+        {
+            res *= 10;
+        }
+
+        return res;
+    }
 }
