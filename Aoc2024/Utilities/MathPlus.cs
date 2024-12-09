@@ -32,4 +32,6 @@ public static class MathPlus
 
         return res;
     }
+
+    public static long SumRange(long start, long count) => count * (2 * start + count - 1) / 2;
 }
