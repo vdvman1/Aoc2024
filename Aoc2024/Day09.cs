@@ -2,6 +2,15 @@
 
 public partial class Day09 : DayBase
 {
+    /*
+     * Measured performance:
+     * 
+     * | Method | Mean         | Error     | StdDev    |
+     * |------- |-------------:|----------:|----------:|
+     * | Solve1 |     120.9 us |   0.21 us |   0.29 us |
+     * | Solve2 | 103,313.5 us | 307.59 us | 460.39 us |
+     */
+
     public override void ParseData()
     {
         // No common parsing
