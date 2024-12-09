@@ -5,10 +5,10 @@ public partial class Day09 : DayBase
     /*
      * Measured performance:
      * 
-     * | Method | Mean         | Error     | StdDev    |
-     * |------- |-------------:|----------:|----------:|
-     * | Solve1 |     120.9 us |   0.21 us |   0.29 us |
-     * | Solve2 | 103,313.5 us | 307.59 us | 460.39 us |
+     * | Method | Mean        | Error     | StdDev    |
+     * |------- |------------:|----------:|----------:|
+     * | Solve1 |    121.9 us |   2.62 us |   3.68 us |
+     * | Solve2 | 61,354.8 us | 375.17 us | 525.93 us |
      */
 
     public override void ParseData()
@@ -100,10 +100,11 @@ public partial class Day09 : DayBase
             --endID;
         }
 
+        int searchStart = 0;
+        int originalIndex = sortedFs.Count - 1;
         // Loop from the last block and work backwards
         while (endID >= 0)
         {
-            int originalIndex = sortedFs.Count - 1;
             var block = sortedFs[originalIndex];
             while (block.ID != endID)
             {
@@ -111,8 +112,14 @@ public partial class Day09 : DayBase
                 block = sortedFs[originalIndex];
             }
 
-            int goalIndex = 0;
+            int goalIndex = searchStart;
             var goalRange = sortedFs[goalIndex];
+            while (goalIndex < originalIndex && goalRange.ID != BlockRange.EMPTY_ID)
+            {
+                ++searchStart;
+                ++goalIndex;
+                goalRange = sortedFs[goalIndex];
+            }
             while (goalIndex < originalIndex && (goalRange.ID != BlockRange.EMPTY_ID || goalRange.Length < block.Length))
             {
                 ++goalIndex;
@@ -155,6 +162,7 @@ public partial class Day09 : DayBase
             }
 
             --endID;
+            --originalIndex;
         }
 
         long checksum = 0;
