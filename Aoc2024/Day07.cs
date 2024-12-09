@@ -7,11 +7,11 @@ public partial class Day07 : DayBase
     /*
      * Measured performance:
      * 
-     * | Method    | Mean         | Error       | StdDev      |
-     * |---------- |-------------:|------------:|------------:|
-     * | ParseData |     149.4 us |     2.51 us |     3.59 us |
-     * | Solve1    |   1,107.2 us |    10.13 us |    14.20 us |
-     * | Solve2    | 353,388.0 us | 3,536.62 us | 4,957.84 us |
+     * | Method    | Mean     | Error   | StdDev  |
+     * |---------- |---------:|--------:|--------:|
+     * | ParseData | 144.7 us | 1.15 us | 1.68 us |
+     * | Solve1    | 118.6 us | 0.29 us | 0.43 us |
+     * | Solve2    | 201.6 us | 0.53 us | 0.77 us |
      */
 
     private readonly record struct Equation(long Result, List<int> Terms);
@@ -45,7 +45,7 @@ public partial class Day07 : DayBase
 
         foreach (var (result, terms) in Equations)
         {
-            if (HasSolution1(result, terms[0], CollectionsMarshal.AsSpan(terms)[1..]))
+            if (HasSolution1(result, CollectionsMarshal.AsSpan(terms)))
             {
                 sum += result;
             }
@@ -54,15 +54,26 @@ public partial class Day07 : DayBase
         return sum.ToString();
     }
 
-    private static bool HasSolution1(long goal, long partialResult, ReadOnlySpan<int> remainingTerms)
+    private static bool HasSolution1(long goal, ReadOnlySpan<int> terms)
     {
-        if (remainingTerms.Length == 0)
+        switch (terms)
         {
-            return partialResult == goal;
+            case [int n]:
+                return n == goal;
+            case [.. var rest, int n]:
+                if (Math.DivRem(goal, n) is (var newGoal, 0L) && HasSolution1(newGoal, rest))
+                {
+                    return true;
+                }
+
+                if (goal >= n && HasSolution1(goal - n, rest))
+                {
+                    return true;
+                }
+                break;
         }
 
-        return HasSolution1(goal, partialResult + remainingTerms[0], remainingTerms[1..])
-            || HasSolution1(goal, partialResult * remainingTerms[0], remainingTerms[1..]);
+        return false;
     }
 
     [Benchmark]
@@ -72,7 +83,7 @@ public partial class Day07 : DayBase
 
         foreach (var (result, terms) in Equations)
         {
-            if (HasSolution2(result, terms[0], CollectionsMarshal.AsSpan(terms)[1..]))
+            if (HasSolution2(result, CollectionsMarshal.AsSpan(terms)))
             {
                 sum += result;
             }
@@ -81,15 +92,31 @@ public partial class Day07 : DayBase
         return sum.ToString();
     }
 
-    private static bool HasSolution2(long goal, long partialResult, ReadOnlySpan<int> remainingTerms)
+    private static bool HasSolution2(long goal, ReadOnlySpan<int> terms)
     {
-        if (remainingTerms.Length == 0)
+        switch (terms)
         {
-            return partialResult == goal;
+            case [int n]:
+                return n == goal;
+            case [.. var rest, int n]:
+                if (Math.DivRem(goal, n) is (var newGoal, 0L) && HasSolution2(newGoal, rest))
+                {
+                    return true;
+                }
+
+                (newGoal, var bottomDigits) = Math.DivRem(goal, n.NextPow10());
+                if (bottomDigits == n && HasSolution2(newGoal, rest))
+                {
+                    return true;
+                }
+
+                if (goal >= n && HasSolution2(goal - n, rest))
+                {
+                    return true;
+                }
+                break;
         }
 
-        return HasSolution2(goal, partialResult + remainingTerms[0], remainingTerms[1..])
-            || HasSolution2(goal, partialResult * remainingTerms[0], remainingTerms[1..])
-            || HasSolution2(goal, long.Parse(partialResult.ToString() + remainingTerms[0]), remainingTerms[1..]);
+        return false;
     }
 }
