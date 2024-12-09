@@ -1,14 +1,14 @@
-﻿namespace Aoc2024;
+namespace Aoc2024;
 
 public partial class Day09 : DayBase
 {
     /*
      * Measured performance:
      * 
-     * | Method | Mean        | Error     | StdDev    |
-     * |------- |------------:|----------:|----------:|
-     * | Solve1 |    121.9 us |   2.62 us |   3.68 us |
-     * | Solve2 | 61,354.8 us | 375.17 us | 525.93 us |
+     * | Method | Mean         | Error      | StdDev     |
+     * |------- |-------------:|-----------:|-----------:|
+     * | Solve1 |     67.33 us |   0.351 us |   0.515 us |
+     * | Solve2 | 61,118.95 us | 271.863 us | 381.113 us |
      */
 
     public override void ParseData()
@@ -51,18 +51,20 @@ public partial class Day09 : DayBase
                 break;
             }
 
-            for (int emptySize = fs[startIndex] - '0'; emptySize > 0 && endIndex > startIndex; --emptySize)
+            int emptySize = fs[startIndex] - '0';
+            while (endCount <= emptySize)
             {
-                checksum += endID * compactedIndex;
-                ++compactedIndex;
-                --endCount;
-                if (endCount == 0)
-                {
-                    --endID;
-                    endIndex -= 2; // Skip over blank space at end
-                    endCount = fs[endIndex] - '0';
-                }
+                checksum += endID * MathPlus.SumRange(compactedIndex, endCount);
+                compactedIndex += endCount;
+                emptySize -= endCount;
+                --endID;
+                endIndex -= 2; // Skip over blank space at end
+                endCount = fs[endIndex] - '0';
             }
+
+            checksum += endID * MathPlus.SumRange(compactedIndex, emptySize);
+            compactedIndex += emptySize;
+            endCount -= emptySize;
 
             ++startIndex;
             ++startID;
@@ -171,18 +173,12 @@ public partial class Day09 : DayBase
         {
             var (id, range) = block;
 
-            if (id == BlockRange.EMPTY_ID)
+            if (id != BlockRange.EMPTY_ID)
             {
-                fsIndex += range;
-                continue;
+                checksum += id * MathPlus.SumRange(fsIndex, range);
             }
 
-            while (range > 0)
-            {
-                checksum += id * fsIndex;
-                ++fsIndex;
-                --range;
-            }
+            fsIndex += range;
         }
         return checksum.ToString();
     }
