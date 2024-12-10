@@ -1,4 +1,4 @@
-namespace Aoc2024;
+﻿namespace Aoc2024;
 
 public partial class Day09 : DayBase
 {
@@ -7,8 +7,8 @@ public partial class Day09 : DayBase
      * 
      * | Method | Mean         | Error      | StdDev     |
      * |------- |-------------:|-----------:|-----------:|
-     * | Solve1 |     67.33 us |   0.351 us |   0.515 us |
-     * | Solve2 | 61,118.95 us | 271.863 us | 381.113 us |
+     * | Solve1 |     66.60 us |   0.291 us |   0.427 us |
+     * | Solve2 | 62,217.41 us | 328.575 us | 471.232 us |
      */
 
     public override void ParseData()
@@ -131,40 +131,77 @@ public partial class Day09 : DayBase
             if (goalIndex < originalIndex) // Found an empty block to use
             {
                 sortedFs[goalIndex] = block;
+
                 // Ensure remaining space in empty block isn't lost
                 if (block.Length < goalRange.Length)
                 {
-                    sortedFs.Insert(goalIndex + 1, new(BlockRange.EMPTY_ID, goalRange.Length - block.Length));
-                    ++originalIndex;
-                }
-
-                // Merge potentially newly adjacent empty blocks at the original index
-                if (sortedFs[originalIndex - 1] is (BlockRange.EMPTY_ID, var range0))
-                {
-                    if (originalIndex + 1 < sortedFs.Count && sortedFs[originalIndex + 1] is (BlockRange.EMPTY_ID, var range1))
+                    // Merge potentially newly adjacent empty blocks at the original index, while avoiding unnecessary insertions/deletions
+                    if (sortedFs[originalIndex - 1] is (BlockRange.EMPTY_ID, var range0))
                     {
-                        sortedFs[originalIndex - 1] = new(BlockRange.EMPTY_ID, range0 + block.Length + range1);
-                        sortedFs.RemoveRange(originalIndex, 2);
+                        sortedFs.ShiftElement(originalIndex, goalIndex + 1) = new(BlockRange.EMPTY_ID, goalRange.Length - block.Length);
+                        // sortedFs[originalIndex - 1] is now at sortedFs[originalIndex]
+
+                        if (originalIndex + 1 < sortedFs.Count && sortedFs[originalIndex + 1] is (BlockRange.EMPTY_ID, var range1))
+                        {
+                            sortedFs[originalIndex] = new(BlockRange.EMPTY_ID, range0 + block.Length + range1);
+                            sortedFs.RemoveAt(originalIndex + 1);
+                        }
+                        else
+                        {
+                            sortedFs[originalIndex] = new(BlockRange.EMPTY_ID, range0 + block.Length);
+                        }
+
+                        // sortedFs[originalIndex] is now empty, reduce by one to avoid checking it when looking for the next block to move
+                        --originalIndex;
+                    }
+                    else if (originalIndex + 1 < sortedFs.Count && sortedFs[originalIndex + 1] is (BlockRange.EMPTY_ID, var range))
+                    {
+                        sortedFs.ShiftElement(originalIndex, goalIndex + 1) = new(BlockRange.EMPTY_ID, goalRange.Length - block.Length);
+                        sortedFs[originalIndex + 1] = new(BlockRange.EMPTY_ID, block.Length + range);
                     }
                     else
                     {
-                        sortedFs[originalIndex - 1] = new(BlockRange.EMPTY_ID, range0 + block.Length);
-                        sortedFs.RemoveAt(originalIndex);
+                        sortedFs.Insert(goalIndex + 1, new(BlockRange.EMPTY_ID, goalRange.Length - block.Length));
+                        // sortedFs[originalIndex] is now at sortedFs[originalIndex + 1]
+                        sortedFs[originalIndex + 1] = new(BlockRange.EMPTY_ID, block.Length);
                     }
-                }
-                else if (originalIndex + 1 < sortedFs.Count && sortedFs[originalIndex + 1] is (BlockRange.EMPTY_ID, var range))
-                {
-                    sortedFs[originalIndex] = new(BlockRange.EMPTY_ID, block.Length + range);
-                    sortedFs.RemoveAt(originalIndex + 1);
                 }
                 else
                 {
-                    sortedFs[originalIndex] = new(BlockRange.EMPTY_ID, block.Length);
+                    // Merge potentially newly adjacent empty blocks at the original index
+                    if (sortedFs[originalIndex - 1] is (BlockRange.EMPTY_ID, var range0))
+                    {
+                        if (originalIndex + 1 < sortedFs.Count && sortedFs[originalIndex + 1] is (BlockRange.EMPTY_ID, var range1))
+                        {
+                            sortedFs[originalIndex - 1] = new(BlockRange.EMPTY_ID, range0 + block.Length + range1);
+                            sortedFs.RemoveRange(originalIndex, 2);
+                        }
+                        else
+                        {
+                            sortedFs[originalIndex - 1] = new(BlockRange.EMPTY_ID, range0 + block.Length);
+                            sortedFs.RemoveAt(originalIndex);
+                        }
+
+                        // sortedFs[originalIndex - 1] is known to be empty, reduce by 2 to avoid checking it when looking for the next block to move
+                        originalIndex -= 2;
+                    }
+                    else if (originalIndex + 1 < sortedFs.Count && sortedFs[originalIndex + 1] is (BlockRange.EMPTY_ID, var range))
+                    {
+                        sortedFs[originalIndex] = new(BlockRange.EMPTY_ID, block.Length + range);
+                        sortedFs.RemoveAt(originalIndex + 1);
+                        // sortedFs[originalIndex] is now empty, reduce by one to avoid checking it when looking for the next block to move
+                        --originalIndex;
+                    }
+                    else
+                    {
+                        sortedFs[originalIndex] = new(BlockRange.EMPTY_ID, block.Length);
+                        // sortedFs[originalIndex] is now empty, reduce by one to avoid checking it when looking for the next block to move
+                        --originalIndex;
+                    }
                 }
             }
 
             --endID;
-            --originalIndex;
         }
 
         long checksum = 0;
