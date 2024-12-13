@@ -1,7 +1,17 @@
-namespace Aoc2024;
+﻿namespace Aoc2024;
 
 public partial class Day10 : DayBase
 {
+    /*
+     * Measured performance:
+     * 
+     * | Method    | Mean      | Error    | StdDev   |
+     * |---------- |----------:|---------:|---------:|
+     * | ParseData |  10.58 us | 0.208 us | 0.312 us |
+     * | Solve1    | 328.62 us | 1.673 us | 2.345 us |
+     * | Solve2    | 383.71 us | 1.614 us | 2.314 us |
+     */
+
     private readonly List<List<byte>> Map = [];
     private readonly List<VectorI2d> Trailheads = [];
 
