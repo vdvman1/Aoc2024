@@ -17,4 +17,12 @@ public static class ListExtensions
             Array.Fill(row, value);
         }
     }
+
+    public static ref T RefAt<T>(this List<T[]> grid, VectorI2d index) => ref grid[index.Y][index.X];
+
+    public static T At<T>(this List<T[]> grid, VectorI2d index) => grid[index.Y][index.X];
+
+    public static T At<T>(this List<List<T>> grid, VectorI2d index) => grid[index.Y][index.X];
+
+    public static ref T RefAt<T>(this T[,] grid, VectorI2d index) => ref grid[index.Y, index.X];
 }
