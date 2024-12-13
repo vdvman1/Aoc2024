@@ -82,6 +82,41 @@ public partial class Day10 : DayBase
     [Benchmark]
     public override string Solve2()
     {
-        throw new NotImplementedException();
+        var total = 0;
+        var stack = new Stack<VectorI2d>();
+
+        foreach (var head in Trailheads)
+        {
+            var nextHeight = Map.At(head) + 1;
+
+            foreach (var (adjacentPos, height) in Map.Adjacent4(head))
+            {
+                if (height == nextHeight)
+                {
+                    stack.Push(adjacentPos);
+                }
+            }
+
+            while (stack.TryPop(out var pos))
+            {
+                nextHeight = Map.At(pos) + 1;
+                foreach (var (adjacentPos, height) in Map.Adjacent4(pos))
+                {
+                    if (height == nextHeight)
+                    {
+                        if (nextHeight == 9)
+                        {
+                            ++total;
+                        }
+                        else
+                        {
+                            stack.Push(adjacentPos);
+                        }
+                    }
+                }
+            }
+        }
+
+        return total.ToString();
     }
 }
