@@ -7,9 +7,9 @@ public partial class Day04 : DayBase
      * 
      * | Method    | Mean       | Error     | StdDev    |
      * |---------- |-----------:|----------:|----------:|
-     * | ParseData |   5.039 us | 0.0795 us | 0.1114 us |
-     * | Solve1    | 163.102 us | 0.6475 us | 0.9286 us |
-     * | Solve2    |  95.337 us | 0.3576 us | 0.5013 us |
+     * | ParseData |   4.996 us | 0.2269 us | 0.3397 us |
+     * | Solve1    | 157.238 us | 1.6996 us | 2.3265 us |
+     * | Solve2    |  97.799 us | 0.4960 us | 0.7270 us |
      */
 
     private readonly List<byte[]> Grid = [];
@@ -22,18 +22,14 @@ public partial class Day04 : DayBase
         // TODO: Avoid allocating a new array for each line using a 2d array
 
         Grid.Clear();
-        while (!parser.IsEmpty)
+        while (!parser.IsEmpty && parser.ParseLine().Remainder is var line && line.Length > 0)
         {
-            var line = parser.ParseLine().Remainder;
-            if (line.Length > 0)
+            if (line[^1] == (byte)'\r')
             {
-                if (line[^1] == (byte)'\r')
-                {
-                    line = line[..^1];
-                }
-
-                Grid.Add(line.ToArray());
+                line = line[..^1];
             }
+
+            Grid.Add(line.ToArray());
         }
     }
 

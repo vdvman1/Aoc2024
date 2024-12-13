@@ -8,11 +8,11 @@ public partial class Day06 : DayBase
     /*
      * Measured performance:
      * 
-     * | Method    | Mean        | Error     | StdDev    |
-     * |---------- |------------:|----------:|----------:|
-     * | ParseData |    101.5 us |   0.66 us |   0.95 us |
-     * | Solve1    |    102.5 us |   0.37 us |   0.49 us |
-     * | Solve2    | 64,495.8 us | 124.03 us | 177.88 us |
+     * | Method    | Mean         | Error      | StdDev     |
+     * |---------- |-------------:|-----------:|-----------:|
+     * | ParseData |     98.69 μs |   0.558 μs |   0.782 μs |
+     * | Solve1    |    100.90 μs |   0.410 μs |   0.613 μs |
+     * | Solve2    | 72,552.75 μs | 390.099 μs | 571.802 μs |
      */
 
     private enum Cell : byte
@@ -121,13 +121,19 @@ public partial class Day06 : DayBase
         private bool TravelledInDirection;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ref bool DirectionRef(List<CellDirections[]> map, VectorI2d pos, VectorI2d direction) => ref map.RefAt(pos)[direction.GetUnitHash()];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void MarkVisit(List<CellDirections[]> map, VectorI2d pos, VectorI2d direction) => map.RefAt(pos)[direction.GetUnitHash()] = true;
+
     [Benchmark]
     public override string Solve2()
     {
         var originalVisitedMap = Map.ConvertAll(row => new CellDirections[row.Count]);
         var pos = GuardStartPos;
         var direction = GuardStartDirection;
-        originalVisitedMap[pos.Y][pos.X][direction.GetUnitHash()] = true;
+        MarkVisit(originalVisitedMap, pos, direction);
 
         // Avoid allocating a new map for every attempt
         var attemptVisitedMap = originalVisitedMap.ConvertAll(row => row.ToArray());
@@ -142,10 +148,8 @@ public partial class Day06 : DayBase
             // Don't bother attempting to place obstacles where one already exists, and don't attempt at the guard's starting position
             if (cell == Cell.Empty)
             {
-                ref bool tried = ref triedLocations[nextPos.Y][nextPos.X];
-                if (!tried)
+                if (triedLocations.MarkAt(nextPos))
                 {
-                    tried = true;
                     originalVisitedMap.CopyTo2d(attemptVisitedMap);
                     if (FormsLoop(attemptVisitedMap, pos, direction))
                     {
@@ -165,7 +169,8 @@ public partial class Day06 : DayBase
                 pos = nextPos;
                 nextPos += direction;
             }
-            originalVisitedMap[pos.Y][pos.X][direction.GetUnitHash()] = true;
+
+            MarkVisit(originalVisitedMap, pos, direction);
         }
 
         return count.ToString();
@@ -177,7 +182,7 @@ public partial class Day06 : DayBase
         var tempObstaclePos = nextPos;
         while (0 <= nextPos.Y && nextPos.Y < Map.Count && 0 <= nextPos.X && Map[nextPos.Y] is var row && nextPos.X < row.Count)
         {
-            ref bool visited = ref visitedMap[nextPos.Y][nextPos.X][direction.GetUnitHash()];
+            ref bool visited = ref DirectionRef(visitedMap, nextPos, direction);
             if (visited)
             {
                 return true;
@@ -187,7 +192,7 @@ public partial class Day06 : DayBase
             {
                 direction = direction.Rotated90CW();
                 // Also mark the new direction at the current position as visited
-                visitedMap[pos.Y][pos.X][direction.GetUnitHash()] = true;
+                MarkVisit(visitedMap, pos, direction);
                 nextPos = pos + direction;
             }
             else

@@ -7,9 +7,9 @@ public partial class Day08 : DayBase
      * 
      * | Method    | Mean      | Error     | StdDev    |
      * |---------- |----------:|----------:|----------:|
-     * | ParseData |  7.305 us | 0.0840 us | 0.1205 us |
-     * | Solve1    | 16.038 us | 0.0589 us | 0.0807 us |
-     * | Solve2    | 57.130 us | 0.1927 us | 0.2825 us |
+     * | ParseData |  7.709 us | 0.0657 us | 0.0984 us |
+     * | Solve1    | 18.121 us | 0.0941 us | 0.1408 us |
+     * | Solve2    | 66.094 us | 0.2858 us | 0.4099 us |
      */
 
     private readonly Dictionary<byte, List<VectorI2d>> Antennas = [];
@@ -83,10 +83,8 @@ public partial class Day08 : DayBase
         if ((uint)pos.X < (uint)Width && (uint)pos.Y < (uint)Height)
         {
             outOfBounds = false;
-            ref var existing = ref seen[pos.Y, pos.X];
-            if (!existing)
+            if (seen.MarkAt(pos))
             {
-                existing = true;
                 return 1;
             }
         }
