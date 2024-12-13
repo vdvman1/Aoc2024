@@ -1,4 +1,4 @@
-namespace Aoc2024.Utilities;
+﻿namespace Aoc2024.Utilities;
 
 public static class MathPlus
 {
@@ -45,6 +45,23 @@ public static class MathPlus
         }
 
         return digits;
+    }
+
+    public static long Pow(this long value, int exponent)
+    {
+        long res = 1;
+        while (exponent != 0)
+        {
+            if ((exponent & 1) == 1)
+            {
+                res *= value;
+            }
+
+            value *= value;
+            exponent >>= 1;
+        }
+
+        return res;
     }
 
     public static long SumRange(long start, long count) => count * (2 * start + count - 1) / 2;
