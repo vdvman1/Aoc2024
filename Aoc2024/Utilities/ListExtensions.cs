@@ -54,6 +54,34 @@ public static class ListExtensions
         }
     }
 
+    public static IEnumerable<KeyValuePair<VectorI2d, T>> Adjacent4<T>(this List<T[]> grid, VectorI2d center)
+    {
+        var index = center + VectorI2d.UP;
+        if (index.Y >= 0)
+        {
+            yield return KeyValuePair.Create(index, grid.At(index));
+        }
+
+        index = center + VectorI2d.DOWN;
+        if (index.Y < grid.Count)
+        {
+            yield return KeyValuePair.Create(index, grid.At(index));
+        }
+
+        var row = grid[center.Y];
+        index = center + VectorI2d.LEFT;
+        if (index.X >= 0)
+        {
+            yield return KeyValuePair.Create(index, row[index.X]);
+        }
+
+        index = center + VectorI2d.RIGHT;
+        if (index.X < row.Length)
+        {
+            yield return KeyValuePair.Create(index, row[index.X]);
+        }
+    }
+
     public static bool MarkAt(this List<bool[]> grid, VectorI2d pos)
     {
         ref var marked = ref grid.RefAt(pos);
