@@ -25,4 +25,22 @@ public static class ListExtensions
     public static T At<T>(this List<List<T>> grid, VectorI2d index) => grid[index.Y][index.X];
 
     public static ref T RefAt<T>(this T[,] grid, VectorI2d index) => ref grid[index.Y, index.X];
+
+    public static bool MarkAt(this List<bool[]> grid, VectorI2d pos)
+    {
+        ref var marked = ref grid.RefAt(pos);
+        if (marked) return false;
+
+        marked = true;
+        return true;
+    }
+
+    public static bool MarkAt(this bool[,] grid, VectorI2d pos)
+    {
+        ref var marked = ref grid.RefAt(pos);
+        if (marked) return false;
+
+        marked = true;
+        return true;
+    }
 }
