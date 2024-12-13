@@ -1,4 +1,4 @@
-namespace Aoc2024.Utilities;
+﻿namespace Aoc2024.Utilities;
 
 public static class ListExtensions
 {
@@ -25,6 +25,34 @@ public static class ListExtensions
     public static T At<T>(this List<List<T>> grid, VectorI2d index) => grid[index.Y][index.X];
 
     public static ref T RefAt<T>(this T[,] grid, VectorI2d index) => ref grid[index.Y, index.X];
+
+    public static IEnumerable<KeyValuePair<VectorI2d, T>> Adjacent4<T>(this List<List<T>> grid, VectorI2d center)
+    {
+        var index = center + VectorI2d.UP;
+        if (index.Y >= 0)
+        {
+            yield return KeyValuePair.Create(index, grid.At(index));
+        }
+
+        index = center + VectorI2d.DOWN;
+        if (index.Y < grid.Count)
+        {
+            yield return KeyValuePair.Create(index, grid.At(index));
+        }
+
+        var row = grid[center.Y];
+        index = center + VectorI2d.LEFT;
+        if (index.X >= 0)
+        {
+            yield return KeyValuePair.Create(index, row[index.X]);
+        }
+
+        index = center + VectorI2d.RIGHT;
+        if (index.X < row.Count)
+        {
+            yield return KeyValuePair.Create(index, row[index.X]);
+        }
+    }
 
     public static bool MarkAt(this List<bool[]> grid, VectorI2d pos)
     {
