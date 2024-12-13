@@ -2,6 +2,16 @@
 
 public partial class Day11 : DayBase
 {
+    /*
+     * Measured performance:
+     * 
+     * | Method    | Mean             | Error          | StdDev         |
+     * |---------- |-----------------:|---------------:|---------------:|
+     * | ParseData |         27.94 ns |       0.452 ns |       0.648 ns |
+     * | Solve1    |    231,254.15 ns |   3,292.179 ns |   4,615.175 ns |
+     * | Solve2    | 10,659,883.19 ns | 331,175.815 ns | 485,433.256 ns |
+     */
+
     private readonly List<long> Stones = [];
 
     [Benchmark]
